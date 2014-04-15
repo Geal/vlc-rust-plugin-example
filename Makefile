@@ -1,6 +1,6 @@
 PREFIX = /usr
 LD = ld
-CC = gcc
+CC = cc
 INSTALL = install
 CFLAGS = -g -O2 -Wall -Wextra
 LDFLAGS =
@@ -35,7 +35,7 @@ uninstall:
 	rm -f $(plugindir)/misc/librustnormvol_plugin.so
 
 clean:
-	rm -f -- librustnormvol_plugin.so src/*.o
+	rm -f -- librustnormvol_plugin.so *.o *.bc
 
 mostlyclean: clean
 
@@ -43,7 +43,13 @@ SOURCES = normvol.c
 
 $(SOURCES:%.c=src/%.o): %:
 
-librustnormvol_plugin.so: $(SOURCES:%.c=%.o)
+librustnormvol_plugin.so: $(SOURCES:%.c=%.o) rust_normvol.o
 	$(CC) $(LDFLAGS) -shared -o $@ $^
+
+rust_normvol.bc: rust_normvol.rs
+	rustc --emit=bc rust_normvol.rs
+
+rust_normvol.o: rust_normvol.bc
+	$(CC) -c -fPIC rust_normvol.bc
 
 .PHONY: all install install-strip uninstall clean mostlyclean
