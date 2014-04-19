@@ -62,7 +62,9 @@ vlc_module_end ()
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-/*    filter_t *p_filter = (filter_t*)p_this;
+  msg_Dbg(p_this,
+      "pointer: %08X", p_this);
+    filter_t *p_filter = (filter_t*)p_this;
     unsigned i_channels;
     filter_sys_t *p_sys;
 
@@ -71,6 +73,7 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
+
     p_sys->i_nb = var_CreateGetInteger( p_filter->p_parent, "norm-buff-size" );
     p_sys->f_max = var_CreateGetFloat( p_filter->p_parent, "norm-max-level" );
 
@@ -87,24 +90,26 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
-    */
     return VLC_SUCCESS;
 }
 
+extern int normalize(float *p_in, float *p_out);
 /*****************************************************************************
  * DoWork : normalizes and sends a buffer
  *****************************************************************************/
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
-/*    float *pf_sum;
-    float *pf_gain;
-    float f_average = 0;
-    int i, i_chan;
 
     int i_samples = p_in_buf->i_nb_samples;
     int i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     float *p_out = (float*)p_in_buf->p_buffer;
     float *p_in =  (float*)p_in_buf->p_buffer;
+    int a = normalize(p_in, p_out);
+/*    float *pf_sum;
+    float *pf_gain;
+    float f_average = 0;
+    int i, i_chan;
+
 
     struct filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -192,11 +197,9 @@ out:
  **********************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-  /*
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->p_last );
     free( p_sys );
-    */
 }
